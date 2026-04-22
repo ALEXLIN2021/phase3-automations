@@ -1,16 +1,18 @@
-import { logger, task, wait } from "@trigger.dev/sdk/v3";
+import { logger, task } from "@trigger.dev/sdk/v3";
 
 export const helloWorldTask = task({
   id: "hello-world",
-  // Set an optional maxDuration to prevent tasks from running indefinitely
-  maxDuration: 300, // Stop executing after 300 secs (5 mins) of compute
-  run: async (payload: any, { ctx }) => {
-    logger.log("Hello, world!", { payload, ctx });
+  maxDuration: 300,
+  run: async () => {
+    const envCheck = {
+      anthropic: !!process.env.ANTHROPIC_API_KEY,
+      firecrawl: !!process.env.FIRECRAWL_API_KEY,
+      googleServiceAccount: !!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      googlePrivateKey: !!process.env.GOOGLE_PRIVATE_KEY,
+    };
 
-    await wait.for({ seconds: 5 });
+    logger.log("Environment check", envCheck);
 
-    return {
-      message: "Hello, world!",
-    }
+    return { message: "Hello, world!", envCheck };
   },
 });
